@@ -4,7 +4,7 @@ from users.views import APIFollow, FollowViewSet
 
 from .views import IngredientViewSet, RecipeViewSet, TagViewSet
 
-app_name='api'
+app_name = 'api'
 
 router = DefaultRouter()
 router.register(r'tags', TagViewSet, basename='tags')

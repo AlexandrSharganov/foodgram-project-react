@@ -17,7 +17,6 @@ class Tag(models.Model):
         unique=True,
         verbose_name='Слаг')
 
-
     def __str__(self):
         return f'{self.slug}'
 

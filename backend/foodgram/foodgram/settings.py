@@ -11,7 +11,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
@@ -20,7 +20,6 @@ ALLOWED_HOSTS = [
     'backend',
     '51.250.7.186',
 ]
-
 
 
 INSTALLED_APPS = [

@@ -5,13 +5,12 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from users.models import User, Follow
+from users.models import Follow, User
 
-from .serializers import FollowSerializer, FollowListSerializer
+from .serializers import FollowListSerializer, FollowSerializer
 
 
 class APIFollow(APIView):
-    
     def post(self, request, pk=None):
         user = get_object_or_404(User, username=request.user)
         author = get_object_or_404(User, pk=pk)
@@ -32,7 +31,7 @@ class APIFollow(APIView):
 
 
 class FollowViewSet(mixins.ListModelMixin,
-                          viewsets.GenericViewSet):
+                    viewsets.GenericViewSet):
     pagination_class = CustomPagination
     serializer_class = FollowListSerializer
     permission_classes = (IsAuthenticated,)

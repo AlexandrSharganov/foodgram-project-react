@@ -1,21 +1,18 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework
-from rest_framework import mixins, viewsets, status
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from users.models import User
 from users.serializers import UserRecipeSerializer
-from rest_framework.views import APIView
 
 from .filters import IngredientFilter, RecipeFilter
-from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
-                     Cart, Tag)
+from .models import Cart, Favorite, Ingredient, IngredientAmount, Recipe, Tag
 from .pagination import CustomPagination
 from .permissions import OwnerOrReadOnly
-from .serializers import (IngredientSerializer, RecipeReadSerializer,
-                          RecipeCreateSerializer, TagSerializer)
+from .serializers import (IngredientSerializer, RecipeCreateSerializer,
+                          RecipeReadSerializer, TagSerializer)
 
 
 class TagViewSet(mixins.ListModelMixin,
@@ -26,8 +23,8 @@ class TagViewSet(mixins.ListModelMixin,
 
 
 class IngredientViewSet(mixins.ListModelMixin,
-                 mixins.RetrieveModelMixin,
-                 viewsets.GenericViewSet):
+                        mixins.RetrieveModelMixin,
+                        viewsets.GenericViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (rest_framework.DjangoFilterBackend,)
@@ -49,7 +46,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-        
+
     @action(
         methods=['post', 'delete'],
         detail=False,
@@ -61,7 +58,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if str(request.method) == 'POST':
             Favorite.objects.get_or_create(user=user, recipe=recipe)
             recipe_serializer = UserRecipeSerializer(recipe)
-            return Response(recipe_serializer.data, status=status.HTTP_201_CREATED)
+            return Response(recipe_serializer.data,
+                            status=status.HTTP_201_CREATED)
         instance = get_object_or_404(Favorite, user=user, recipe=recipe)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -77,7 +75,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if str(request.method) == 'POST':
             Cart.objects.get_or_create(user=user, recipe=recipe)
             recipe_serializer = UserRecipeSerializer(recipe)
-            return Response(recipe_serializer.data, status=status.HTTP_201_CREATED)
+            return Response(recipe_serializer.data,
+                            status=status.HTTP_201_CREATED)
         instance = get_object_or_404(Cart, user=user, recipe=recipe)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -96,14 +95,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
             ingredients_list = IngredientAmount.objects.filter(recipe=recipe)
             for ingredient in ingredients_list:
                 if ingredient.ingredient.name in result_dict:
-                    result_dict[ingredient.ingredient.name][0] += ingredient.amount
+                    result_dict[ingredient.ingredient.name][0] += (
+                        ingredient.amount
+                    )
                 else:
                     result_dict[ingredient.ingredient.name] = [
                         ingredient.amount,
                         ingredient.ingredient.measurement_unit
                     ]
         result = (
-            f'Список покупок:\n'
+            'Список покупок:\n'
         )
         for key, value in result_dict.items():
             result += f'\n{key} ({value[1]}) = {str(value[0])}'

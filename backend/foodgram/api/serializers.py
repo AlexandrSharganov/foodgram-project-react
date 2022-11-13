@@ -4,8 +4,8 @@ from rest_framework import serializers
 from users.models import User
 from users.serializers import UserSerializer
 
-from .models import (Favorite, Ingredient, IngredientAmount, Recipe,
-                     Cart, Tag, TagRecipe)
+from .models import (Cart, Favorite, Ingredient, IngredientAmount, Recipe, Tag,
+                     TagRecipe)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -22,7 +22,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class IngredientAmountSerializer(serializers.ModelSerializer):
-    
     id = serializers.IntegerField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
@@ -64,7 +63,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         fields = ('id', 'author', 'name', 'image', 'text', 'ingredients',
                   'tags', 'cooking_time', 'is_favorited',
                   'is_in_shopping_cart')
-        
+
     def get_is_favorited(self, obj):
         username = self.context['request'].user
         if not username.is_authenticated:
@@ -121,7 +120,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return instance
 
 
-
 class RecipeReadSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(
@@ -152,22 +150,3 @@ class RecipeReadSerializer(serializers.ModelSerializer):
             return False
         user = get_object_or_404(User, username=username)
         return Cart.objects.filter(user=user, recipe=obj).exists()
-    
-    
-# class RecipeReadAnonymSerializer(RecipeReadSerializer):
-#     author = UserSerializerForAnonym(read_only=True)
-#     is_favorited = serializers.SerializerMethodField()
-#     is_in_shopping_cart = serializers.SerializerMethodField()
-#     image = Base64ImageField()
-#     tags = TagSerializer(many=True)
-
-#     class Meta:
-#             model = Recipe
-#             fields = ('id', 'author', 'name', 'image', 'text', 'ingredients',
-#                     'tags', 'cooking_time', 'is_favorited', 'is_in_shopping_cart')
-            
-#     def get_is_favorited(self, obj):
-#         return False
-    
-#     def get_is_in_shopping_cart(self, obj):
-#         return False
