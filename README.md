@@ -56,3 +56,6 @@ docker-compose stop
 
 
 ![deploy status](https://github.com/AlexandrSharganov/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg)
+
+## Сайт доступен по адресу:
+[http://51.250.7.186/](http://51.250.7.186/)
