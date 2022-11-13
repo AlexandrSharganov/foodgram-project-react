@@ -11,7 +11,6 @@ services:
 
   backend:
     image:  alexandrsharganov/foodgram_back:latest
-    # build: ../backend/foodgram
     restart: always
     volumes:
       - static_value:/app/static/
@@ -23,7 +22,6 @@ services:
 
   frontend:
     image: alexandrsharganov/foodgram_front:latest
-    # build: ../frontend
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
