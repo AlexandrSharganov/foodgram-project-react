@@ -7,7 +7,7 @@ from api.models import Ingredient
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        with open('../../data/ingredients.json', 'rb') as ingredient:
+        with open('ingredients.json', 'rb') as ingredient:
             data = json.load(ingredient)
             for i in data:
                 ingredient = Ingredient()
