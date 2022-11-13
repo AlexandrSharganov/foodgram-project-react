@@ -15,7 +15,7 @@ jobs:
 
     - name: Install dependencies
       run: | 
-      cd backend/foodgram/
+        cd backend/foodgram/
         # обновление pip
         python -m pip install --upgrade pip 
         # установка flake8 и его плагинов
