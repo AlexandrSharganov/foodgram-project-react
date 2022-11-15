@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from users.models import Follow
 
 from .models import (Cart, Favorite, Ingredient, IngredientAmount, Recipe, Tag,
@@ -7,12 +8,12 @@ from .models import (Cart, Favorite, Ingredient, IngredientAmount, Recipe, Tag,
 
 class TagInline(admin.TabularInline):
     model = TagRecipe
-    extra = 3
+    extra = 0
 
 
 class IngredientsInline(admin.TabularInline):
     model = IngredientAmount
-    extra = 3
+    extra = 0
 
 
 class RecipeAdmin(admin.ModelAdmin):

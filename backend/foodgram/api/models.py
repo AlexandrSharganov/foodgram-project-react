@@ -1,4 +1,8 @@
+from colorfield.fields import ColorField
+
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -7,7 +11,8 @@ class Tag(models.Model):
         max_length=200,
         unique=True,
         verbose_name='Наименование')
-    color = models.CharField(
+    color = ColorField(
+        default='#FF0000',
         max_length=7,
         unique=True,
         verbose_name='Цвет в формате HEX'
@@ -17,12 +22,12 @@ class Tag(models.Model):
         unique=True,
         verbose_name='Слаг')
 
-    def __str__(self):
-        return f'{self.slug}'
-
     class Meta:
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
+
+    def __str__(self):
+        return f'{self.slug}'
 
 
 class Ingredient(models.Model):
@@ -35,12 +40,12 @@ class Ingredient(models.Model):
         verbose_name='Ед. измерения'
     )
 
-    def __str__(self):
-        return f'{self.name}'
-
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+
+    def __str__(self):
+        return self.name
 
 
 class Recipe(models.Model):
@@ -61,8 +66,12 @@ class Recipe(models.Model):
         upload_to='recipe/image/',
         verbose_name='Картинка'
     )
-    cooking_time = models.IntegerField(
-        verbose_name='Время приготовления'
+    cooking_time = models.PositiveSmallIntegerField(
+        verbose_name='Время приготовления',
+        validators=[
+            MaxValueValidator(32767),
+            MinValueValidator(1)
+        ],
     )
     tags = models.ManyToManyField(
         Tag,
@@ -81,13 +90,13 @@ class Recipe(models.Model):
         verbose_name='Дата публикации'
     )
 
-    def __str__(self):
-        return f'{self.name}'
-
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ['-pub_date', ]
+        ordering = ('-pub_date', )
+
+    def __str__(self):
+        return self.name
 
 
 class IngredientAmount(models.Model):
@@ -101,16 +110,20 @@ class IngredientAmount(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Рецепт'
     )
-    amount = models.PositiveIntegerField(
-        verbose_name='Количество'
+    amount = models.PositiveSmallIntegerField(
+        verbose_name='Количество',
+        validators=[
+            MaxValueValidator(32767),
+            MinValueValidator(1)
+        ],
     )
-
-    def __str__(self):
-        return f'{self.amount}'
 
     class Meta:
         verbose_name = 'Ингредиент рецепта'
         verbose_name_plural = 'Ингредиенты рецептов'
+
+    def __str__(self):
+        return f'{self.amount} {self.ingredient}'
 
 
 class TagRecipe(models.Model):
@@ -127,12 +140,12 @@ class TagRecipe(models.Model):
         verbose_name='Рецепт'
     )
 
-    def __str__(self):
-        return f'{self.recipe} {self.tag}'
-
     class Meta:
         verbose_name = 'Тэг рецепта'
         verbose_name_plural = 'Тэги рецептов'
+
+    def __str__(self):
+        return f'{self.recipe} {self.tag}'
 
 
 class Favorite(models.Model):
@@ -149,12 +162,12 @@ class Favorite(models.Model):
         verbose_name='Рецепт'
     )
 
-    def __str__(self):
-        return f'{self.user} {self.recipe}'
-
     class Meta:
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
+
+    def __str__(self):
+        return f'{self.user} {self.recipe}'
 
 
 class Cart(models.Model):
@@ -171,9 +184,9 @@ class Cart(models.Model):
         verbose_name='Рецепт'
     )
 
-    def __str__(self):
-        return f'{self.user} {self.recipe}'
-
     class Meta:
         verbose_name = 'Корзина покупок'
         verbose_name_plural = 'Корзины покупок'
+
+    def __str__(self):
+        return f'{self.user} {self.recipe}'

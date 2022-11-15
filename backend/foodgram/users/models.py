@@ -26,12 +26,12 @@ class User(AbstractUser):
         verbose_name='Пароль'
     )
 
-    def __str__(self):
-        return f'{self.username}'
-
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+    def __str__(self):
+        return self.username
 
 
 class Follow(models.Model):
@@ -48,9 +48,9 @@ class Follow(models.Model):
         verbose_name='Автор'
     )
 
-    def __str__(self):
-        return f'{self.user} {self.author}'
-
     class Meta:
         verbose_name = 'Подписка на авторов'
         verbose_name_plural = 'Подписки на авторов'
+
+    def __str__(self):
+        return f'{self.user} {self.author}'

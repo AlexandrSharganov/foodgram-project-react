@@ -1,6 +1,8 @@
-from django.shortcuts import get_object_or_404
 from drf_extra_fields.fields import Base64ImageField
+
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+
 from users.models import User
 from users.serializers import UserSerializer
 
@@ -66,17 +68,50 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         username = self.context['request'].user
-        if not username.is_authenticated:
-            return False
         user = get_object_or_404(User, username=username)
-        return Favorite.objects.filter(user=user, recipe=obj).exists()
+        return (username.is_authenticated
+                and Favorite.objects.filter(user=user, recipe=obj).exists())
 
     def get_is_in_shopping_cart(self, obj):
         username = self.context['request'].user
-        if not username.is_authenticated:
-            return False
         user = get_object_or_404(User, username=username)
-        return Cart.objects.filter(user=user, recipe=obj).exists()
+        return (username.is_authenticated
+                and Cart.objects.filter(user=user, recipe=obj).exists())
+
+    def validate_ingredients(self, value):
+        """
+        Метод валидации ингредиентов в рецепте.
+        """
+
+        ingredients_list = []
+        ingredients = value
+        if len(ingredients) == 0:
+            raise serializers.ValidationError(
+                'Без ингредиентов нельзя!')
+        for ingredient in ingredients:
+            check_object = ingredient.get('id')
+            if check_object in ingredients_list:
+                raise serializers.ValidationError(
+                    'Продукты в рецепте повторяются!')
+            ingredients_list.append(check_object)
+        return value
+
+    def validate_tags(self, value):
+        """
+        Метод валидации тегов в рецепте.
+        """
+        tags_list = []
+        tags = value
+        if len(tags) == 0:
+            raise serializers.ValidationError(
+                'Без тегов нельзя!')
+        for tag in tags:
+            tag_to_check = get_object_or_404(Ingredient, id=tag.id)
+            if tag_to_check in tags_list:
+                raise serializers.ValidationError(
+                    'Данный тэг уже есть в рецепте!')
+            tags_list.append(tag_to_check)
+        return value
 
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredientamount_set')
@@ -139,14 +174,12 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         username = self.context['request'].user
-        if not username.is_authenticated:
-            return False
         user = get_object_or_404(User, username=username)
-        return Favorite.objects.filter(user=user, recipe=obj).exists()
+        return (username.is_authenticated
+                and Favorite.objects.filter(user=user, recipe=obj).exists())
 
     def get_is_in_shopping_cart(self, obj):
         username = self.context['request'].user
-        if not username.is_authenticated:
-            return False
         user = get_object_or_404(User, username=username)
-        return Cart.objects.filter(user=user, recipe=obj).exists()
+        return (username.is_authenticated
+                and Cart.objects.filter(user=user, recipe=obj).exists())

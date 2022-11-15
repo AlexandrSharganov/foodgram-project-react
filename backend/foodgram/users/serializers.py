@@ -1,9 +1,11 @@
-from api.models import Recipe
+from drf_extra_fields.fields import Base64ImageField
+
 from django.shortcuts import get_object_or_404
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+
+from api.models import Recipe
 
 from .models import Follow, User
 
@@ -97,12 +99,12 @@ class FollowSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
-                fields=['user', 'author'],
+                fields=('user', 'author'),
             )
         ]
 
     def validate(self, data):
-        if data['user'] == data['author']:
+        if data.get('user') == data.get('author'):
             raise serializers.ValidationError(
                 'Нельзя подписаться на себя!')
         return data
