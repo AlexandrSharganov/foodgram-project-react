@@ -18,8 +18,8 @@ jobs:
         cd backend/foodgram/
         # обновление pip
         python -m pip install --upgrade pip 
-        # установка flake8 и его плагинов
-        pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
+        # установка flake8
+        pip install flake8 pep8-naming flake8-broken-line flake8-return
         # установка зависимостей
         pip install -r requirements.txt 
 
