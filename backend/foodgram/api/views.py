@@ -5,8 +5,8 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from api.serializers import AddRecipeSerializer
 from users.models import User
-from users.serializers import UserRecipeSerializer
 
 from .filters import IngredientFilter, RecipeFilter
 from .models import Cart, Favorite, Ingredient, IngredientAmount, Recipe, Tag
@@ -19,6 +19,8 @@ from .serializers import (IngredientSerializer, RecipeCreateSerializer,
 class TagViewSet(mixins.ListModelMixin,
                  mixins.RetrieveModelMixin,
                  viewsets.GenericViewSet):
+    """Вьюсет для работы с тегами."""
+    
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
@@ -26,6 +28,8 @@ class TagViewSet(mixins.ListModelMixin,
 class IngredientViewSet(mixins.ListModelMixin,
                         mixins.RetrieveModelMixin,
                         viewsets.GenericViewSet):
+    """Вьюсет для работы с ингредиентами."""
+
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (rest_framework.DjangoFilterBackend,)
@@ -33,6 +37,8 @@ class IngredientViewSet(mixins.ListModelMixin,
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    """Вьюсет для работы с рецептами."""
+
     queryset = Recipe.objects.all()
     serializer_class = RecipeCreateSerializer
     pagination_class = CustomPagination
@@ -41,6 +47,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = RecipeFilter
 
     def get_serializer_class(self):
+        """Метод выбора сериализатора при разных запросах."""
         if self.action == 'list' or self.action == 'retrieve':
             return RecipeReadSerializer
         return RecipeCreateSerializer
@@ -54,11 +61,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_path=r'(?P<pk>\d+)/favorite'
     )
     def favorite_create_delete(self, request, pk=None):
+        """Метод добавления и удаления из избранного."""
         user = get_object_or_404(User, username=request.user)
         recipe = get_object_or_404(Recipe, pk=pk)
         if str(request.method) == 'POST':
             Favorite.objects.get_or_create(user=user, recipe=recipe)
-            recipe_serializer = UserRecipeSerializer(recipe)
+            recipe_serializer = AddRecipeSerializer(recipe)
             return Response(recipe_serializer.data,
                             status=status.HTTP_201_CREATED)
         instance = get_object_or_404(Favorite, user=user, recipe=recipe)
@@ -71,11 +79,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_path=r'(?P<pk>\d+)/shopping_cart'
     )
     def cart_create_delete(self, request, pk=None):
+        """Метод добавления и удаления из списка покупок."""
         user = get_object_or_404(User, username=request.user)
         recipe = get_object_or_404(Recipe, pk=pk)
         if str(request.method) == 'POST':
             Cart.objects.get_or_create(user=user, recipe=recipe)
-            recipe_serializer = UserRecipeSerializer(recipe)
+            recipe_serializer = AddRecipeSerializer(recipe)
             return Response(recipe_serializer.data,
                             status=status.HTTP_201_CREATED)
         instance = get_object_or_404(Cart, user=user, recipe=recipe)
@@ -88,6 +97,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         url_path='download_shopping_cart'
     )
     def load_shopping_list(self, request):
+        """Метод скачивания списка продуктов."""
         user = get_object_or_404(User, username=request.user)
         recipes_id = Cart.objects.filter(user=user).values('recipe')
         recipes = Recipe.objects.filter(pk__in=recipes_id)

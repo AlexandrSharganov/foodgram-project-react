@@ -7,16 +7,22 @@ from .models import (Cart, Favorite, Ingredient, IngredientAmount, Recipe, Tag,
 
 
 class TagInline(admin.TabularInline):
+    """Добавление тегов в админку рецептов."""
+
     model = TagRecipe
     extra = 0
 
 
 class IngredientsInline(admin.TabularInline):
+    """Добавление ингредиентов в админку рецептов."""
+
     model = IngredientAmount
     extra = 0
 
 
 class RecipeAdmin(admin.ModelAdmin):
+    """Админка рецептов."""
+
     inlines = (TagInline, IngredientsInline)
     list_display = (
         'id', 'name', 'author', 'cooking_time', 'image', 'pub_date',
@@ -28,6 +34,8 @@ class RecipeAdmin(admin.ModelAdmin):
 
 
 class IngredientAdmin(admin.ModelAdmin):
+    """Админка ингредиентов."""
+
     list_display = ('id', 'name', 'measurement_unit')
     list_display_links = ('id', 'name',)
     search_fields = ('name',)
@@ -35,12 +43,16 @@ class IngredientAdmin(admin.ModelAdmin):
 
 
 class IngredientAmountAdmin(admin.ModelAdmin):
+    """Админка количества ингредиентов."""
+
     list_display = ('id', 'ingredient', 'recipe', 'amount',)
     list_display_links = ('id', 'ingredient',)
     empty_value_display = '-пусто-'
 
 
 class TagAdmin(admin.ModelAdmin):
+    """Админка тегов."""
+
     list_display = ('id', 'name', 'slug', 'color',)
     list_display_links = ('id', 'name',)
     empty_value_display = '-пусто-'
