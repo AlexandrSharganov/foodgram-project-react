@@ -4,7 +4,7 @@ WORKDIR /app
 
 ADD . .
 
-RUN /usr/local/bin/python -m pip install --upgrade pip\
+RUN pip freeze>requirements.txt\
     pip install -r requirements.txt --no-cache-dir
 
 CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0:8000"]
