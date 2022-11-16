@@ -4,7 +4,7 @@ WORKDIR /app
 
 ADD . .
 
-RUN pip install -r /app/requirements.txt --no-cache-dir
+RUN pip install -r /app/requirements.txt
 
 
 CMD ["gunicorn", "foodgram.wsgi:application", "--bind", "0:8000"]
