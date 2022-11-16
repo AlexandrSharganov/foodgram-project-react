@@ -48,7 +48,7 @@ jobs:
             context: backend/
             no-cache: true
             tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_back
-            # file: backend/foodgram/Dockerfile
+            file: backend/foodgram/Dockerfile
   deploy:
     runs-on: ubuntu-latest
     needs: build_and_push_to_docker_hub
