@@ -5,7 +5,7 @@ from .models import Ingredient, Recipe, Tag
 
 class IngredientFilter(rest_framework.FilterSet):
     """Фильтр ингредиентов."""
-    
+
     name = rest_framework.CharFilter(
         field_name="name",
         lookup_expr="icontains"

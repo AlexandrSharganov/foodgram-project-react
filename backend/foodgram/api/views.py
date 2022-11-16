@@ -20,7 +20,7 @@ class TagViewSet(mixins.ListModelMixin,
                  mixins.RetrieveModelMixin,
                  viewsets.GenericViewSet):
     """Вьюсет для работы с тегами."""
-    
+
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
