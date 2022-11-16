@@ -2,7 +2,7 @@ FROM python:3.8-slim
 
 WORKDIR /app
 
-ADD . .
+COPY . .
 
 RUN pip freeze>requirements.txt\
     pip install -r requirements.txt --no-cache-dir
