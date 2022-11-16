@@ -40,10 +40,10 @@ docker-compose up -d --build
 ```
 2. Выполните по очереди команды:
 ```
-docker-compose exec web python manage.py migrate
-docker-compose exec web python manage.py createsuperuser
-docker-compose exec web python manage.py collectstatic --no-input
-docker-compose exec web python manage.py load_data
+docker-compose exec backend python manage.py migrate
+docker-compose exec backend python manage.py createsuperuser
+docker-compose exec backend python manage.py collectstatic --no-input
+docker-compose exec backend python manage.py load_data
 ```
 
 3. Для остановки контейнеров выполние команду:
