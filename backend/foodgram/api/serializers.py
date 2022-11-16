@@ -1,10 +1,11 @@
 from drf_extra_fields.fields import Base64ImageField
+from djoser.serializers import UserSerializer
 
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from users.models import User
-from users.serializers import UserSerializer
+from users.models import User, Follow
+from users.serializers import MyUserSerializer
 
 from .models import (Cart, Favorite, Ingredient, IngredientAmount, Recipe, Tag,
                      TagRecipe)
@@ -56,7 +57,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     """Сериализатор для создания рецепта."""
 
     image = Base64ImageField()
-    author = UserSerializer(read_only=True)
+    author = MyUserSerializer(read_only=True)
     ingredients = IngredientAmountCreateSerializer(
         source='ingredientamount_set',
         many=True
@@ -163,9 +164,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
 
 class RecipeReadSerializer(serializers.ModelSerializer):
-    """Сериализатор для чтения рецептов."""
-
-    author = UserSerializer(read_only=True)
+    author = MyUserSerializer(read_only=True)
     ingredients = IngredientAmountSerializer(
         source='ingredientamount_set',
         many=True
@@ -183,16 +182,14 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
     def get_is_favorited(self, obj):
         """Определение избранных рецептов."""
-        username = self.context['request'].user
-        user = get_object_or_404(User, username=username)
-        return (username.is_authenticated
+        user = self.context['request'].user
+        return (not user.is_anonymous
                 and Favorite.objects.filter(user=user, recipe=obj).exists())
 
     def get_is_in_shopping_cart(self, obj):
         """Определение рецептов для покупки."""
-        username = self.context['request'].user
-        user = get_object_or_404(User, username=username)
-        return (username.is_authenticated
+        user = self.context['request'].user
+        return (not user.is_anonymous
                 and Cart.objects.filter(user=user, recipe=obj).exists())
 
 
@@ -205,3 +202,48 @@ class AddRecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
         read_only_fields = ('id', 'name', 'cooking_time')
+
+
+class FollowListSerializer(UserSerializer):
+    """Сериализатор списка подписчиков."""
+
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = (
+            'email', 'id', 'username', 'first_name',
+            'last_name', 'is_subscribed', 'recipes', 'recipes_count'
+        )
+        read_only_fields = ('email', 'username', 'first_name', 'last_name')
+
+    def get_is_subscribed(self, obj):
+        """Метод определения подписки на пользователей."""
+        if self.context:
+            username = self.context['request'].user
+            if not username.is_authenticated or obj.username == username:
+                return False
+            user = get_object_or_404(User, username=username)
+            author = get_object_or_404(User, username=obj.username)
+            return Follow.objects.filter(user=user, author=author).exists()
+        return True
+
+    def get_recipes(self, obj):
+        """Получаем рецепты."""
+        request = self.context.get('request')
+        try:
+            limit = request.GET.get('recipes_limit')
+        except AttributeError:
+            limit = False
+        author = get_object_or_404(User, username=obj.username)
+        recipes = Recipe.objects.filter(author=author)
+        if limit:
+            recipes = recipes.all()[:int(limit)]
+        return AddRecipeSerializer(recipes, many=True).data
+
+    def get_recipes_count(self, obj):
+        """Считаем рецепты."""
+        author = get_object_or_404(User, username=obj.username)
+        return Recipe.objects.filter(author=author).count()

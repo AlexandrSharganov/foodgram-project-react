@@ -23,6 +23,7 @@ class TagViewSet(mixins.ListModelMixin,
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = (OwnerOrReadOnly,)
 
 
 class IngredientViewSet(mixins.ListModelMixin,
@@ -34,13 +35,14 @@ class IngredientViewSet(mixins.ListModelMixin,
     serializer_class = IngredientSerializer
     filter_backends = (rest_framework.DjangoFilterBackend,)
     filterset_class = IngredientFilter
+    permission_classes = (OwnerOrReadOnly,)
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с рецептами."""
 
     queryset = Recipe.objects.all()
-    serializer_class = RecipeCreateSerializer
+    serializer_class = RecipeReadSerializer
     pagination_class = CustomPagination
     permission_classes = (OwnerOrReadOnly,)
     filter_backends = (rest_framework.DjangoFilterBackend,)
