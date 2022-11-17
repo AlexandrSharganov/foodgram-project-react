@@ -14,4 +14,5 @@ class UserAdmin(UserAdmin):
     )
     list_display_links = ('id', 'username')
     search_fields = ('username', 'email',)
+    list_filter = ('email', 'username')
     empty_value_display = '-пусто-'
