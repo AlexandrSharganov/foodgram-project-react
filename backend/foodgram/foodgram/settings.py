@@ -144,3 +144,6 @@ DJOSER = {
         'user_list': ['djoser.permissions.CurrentUserOrAdminOrReadOnly'],
     },
 }
+
+MAX_AMOUNT_INGREDIENT = 32767
+MIN_AMOUNT_INGREDIENT = 1

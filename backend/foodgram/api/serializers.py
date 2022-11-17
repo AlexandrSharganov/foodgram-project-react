@@ -1,6 +1,7 @@
 from drf_extra_fields.fields import Base64ImageField
 from djoser.serializers import UserSerializer
 
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
@@ -98,6 +99,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 'Без ингредиентов нельзя!')
         for ingredient in ingredients:
             check_object = ingredient.get('id')
+            check_amount = ingredient.get('amount')
+            if (check_amount > settings.MAX_AMOUNT_INGREDIENT
+               or check_amount < settings.MIN_AMOUNT_INGREDIENT):
+                raise serializers.ValidationError(
+                    f'Неправильное количество ингредиента {check_object}!')
             if check_object in ingredients_list:
                 raise serializers.ValidationError(
                     'Продукты в рецепте повторяются!')
