@@ -28,18 +28,17 @@ class RecipeAdmin(admin.ModelAdmin):
         'id',
         'name',
         'author',
-        'in_favorite',
     )
     list_display_links = ('id', 'name',)
     search_fields = ('name', 'author__username',)
     list_filter = ('name', 'author', 'tags',)
-    readonly_fields = ('in_favorite',)
+    readonly_fields = ('count_in_favorite',)
     empty_value_display = '-пусто-'
 
-    def in_favorite(self, obj):
-        return obj.in_favorite.all().count()
+    def count_in_favorite(self, obj):
+        return Favorite.objects.filter(recipe=obj).count()
 
-    in_favorite.short_description = ('Количество добавлений в избранное')
+    count_in_favorite.short_description = 'Сколько раз добавлен в избранное'
 
 
 class IngredientAdmin(admin.ModelAdmin):
