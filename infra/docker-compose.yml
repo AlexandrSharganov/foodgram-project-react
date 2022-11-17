@@ -10,7 +10,7 @@ services:
       - ./.env
 
   backend:
-    image:  alexandrsharganov/foodgram_back:latest
+    image:  alexandrsharganov/foodgram_backsite:latest
     restart: always
     volumes:
       - static_value:/app/static/
